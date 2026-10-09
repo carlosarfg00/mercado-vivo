@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#39215a">
+  <title>Mercado Vivo · Aprende jugando</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ctext y='32' font-size='32'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#"><span class="brand-icon">✦</span><span>MERCADO VIVO<small>Una aventura entre números y personas</small></span></a>
+    <div class="hud"><span id="level">Nivel 1</span><span id="lives" aria-label="Vidas">♥ ♥ ♥</span><span id="score">0 XP</span><span id="coins">0 ✦</span></div>
+    <button id="save-menu" class="soft">Mi partida</button>
+  </header>
+  <main>
+    <section class="intro"><div><span class="eyebrow">TU PRIMER DÍA EN LA CIUDAD</span><h1>El mercado se aprende<br><em>viviéndolo.</em></h1><p>Explora. Ayuda a tus vecinos. Descubre qué hay detrás de cada precio.</p></div><div class="progress-note"><span id="progress-text">0 de 12 misiones</span><div class="progress-track"><div id="progress-fill"></div></div><small id="save-status">Guardado automático en este navegador</small></div></section>
+    <div class="game-layout">
+      <section class="world-panel" aria-label="Ciudad del juego">
+        <div class="world-heading"><span><span class="live-dot"></span> Plaza de los posibles</span><span class="world-sub">EXPLORE MODE</span></div>
+        <canvas id="world" width="960" height="600" aria-label="Mapa interactivo: muévete con las flechas o WASD. Pulsa E cerca de un personaje. También puedes usar los botones de lugares."></canvas>
+        <div class="world-footer"><span id="world-hint">Flechas / WASD para caminar · E para conversar · clic para moverte</span><button id="practice" class="soft">♡ Recuperar vidas</button></div>
+        <div class="mobile-controls" aria-label="Movimiento"><button data-move="up" aria-label="Arriba">↑</button><div><button data-move="left" aria-label="Izquierda">←</button><button id="interact-mobile">Hablar</button><button data-move="right" aria-label="Derecha">→</button></div><button data-move="down" aria-label="Abajo">↓</button></div>
+      </section>
+      <aside class="journal">
+        <div class="journal-heading"><span class="eyebrow">TU CUADERNO DE AVENTURAS</span><h2>Pequeños pasos.<br>Grandes ideas.</h2></div>
+        <div id="next-mission" class="next-mission"></div>
+        <nav id="places" aria-label="Lugares de la ciudad"></nav>
+        <button id="arcade" class="arcade-button"><span>⚽</span><span>Un descanso en la cancha<small>Penales y premios para tu personaje</small></span><span>↗</span></button>
+        <p class="journal-foot">Precios ficticios · Aprendizaje a tu ritmo</p>
+      </aside>
+    </div>
+    <section class="curriculum"><div class="section-heading"><div><span class="eyebrow">DEL PRIMER PRECIO A TU PRIMERA ESTRATEGIA</span><h2>Tu camino por el mercado</h2></div><button id="sources-button" class="soft">Fuentes y reglas del juego ↗</button></div><div id="mission-list" class="mission-list"></div></section>
+  </main>
+  <footer>Hecho para explorar, equivocarte y volver a intentar. <span>Prototipo educativo v0.1 · Sin conexión a cuentas</span></footer>
+  <dialog id="mission-dialog"><div class="modal-header"><span id="modal-kicker" class="eyebrow"></span><button id="close-dialog" class="icon-button" aria-label="Cerrar misión">×</button></div><div id="mission-content"></div></dialog>
+  <dialog id="welcome"><div class="welcome-symbol">✦</div><span class="eyebrow">BIENVENIDO A MERCADO VIVO</span><h2>Tu aventura empieza<br>con una pregunta.</h2><p>¿Quién compra, quién vende y por qué? Camina por la ciudad y ayúdalos a descubrirlo.</p><div class="welcome-tips"><span>↗ Explora con flechas o WASD</span><span>♡ Tienes 3 vidas y puedes recuperarlas</span><span>✦ Tu progreso se guarda aquí</span></div><button id="start-game" class="primary">Entrar a la ciudad →</button></dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <input id="import-save" type="file" accept="application/json,.json" hidden>
+  <script src="engine.js"></script><script src="missions.js"></script><script src="app.js"></script>
+</body></html>

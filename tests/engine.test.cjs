@@ -1,0 +1,21 @@
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const E=require('../dist/engine.js');
+const book=[{price:102,bid:0,ask:3},{price:101,bid:0,ask:2},{price:100,bid:4,ask:0},{price:99,bid:5,ask:0}];
+test('Market buy consumes best asks, computes weighted price and preserves input',()=>{
+ const original=JSON.stringify(book),r=E.executeOrder(book,'buy',5,'market');
+ assert.equal(r.filled,5);assert.equal(r.average,101.6);assert.equal(r.cost,508);assert.deepEqual(r.fills,[{price:101,quantity:2},{price:102,quantity:3}]);assert.equal(JSON.stringify(book),original);
+});
+test('Limit buy partially fills and leaves a remainder without crossing its limit',()=>{const r=E.executeOrder(book,'buy',5,'limit',101);assert.equal(r.filled,2);assert.equal(r.remaining,3);assert.equal(r.status,'pending');assert.equal(r.average,101);});
+test('Nonmarketable limit rests without pretending to fill at last price',()=>{const r=E.executeOrder(book,'buy',3,'limit',100);assert.equal(r.filled,0);assert.equal(r.average,null);assert.equal(r.remaining,3);});
+test('Sell orders consume bids from highest to lowest',()=>{const r=E.executeOrder(book,'sell',6,'market');assert.deepEqual(r.fills,[{price:100,quantity:4},{price:99,quantity:2}]);assert.equal(r.average,99.67);});
+test('Insufficient market liquidity is reported as unfilled, never fabricated',()=>{const r=E.executeOrder(book,'buy',8,'market');assert.equal(r.filled,5);assert.equal(r.remaining,3);assert.equal(r.status,'unfilled');});
+test('Invalid quantities and limit prices are rejected',()=>{for(const q of [0,-1,1.5,Infinity])assert.throws(()=>E.executeOrder(book,'buy',q,'market'));assert.throws(()=>E.executeOrder(book,'buy',1,'limit',NaN));});
+test('Futures direction, multiplier and tick value determine P&L',()=>{assert.equal(E.futuresProfit('buy',100,100.75,2,10),15);assert.equal(E.futuresProfit('sell',100,100.75,2,10),-15);});
+test('Crop/futures hedge is constant under explicit no-basis assumptions',()=>{for(const p of [0,3,5,7,10])assert.equal(E.cornOutcome('future',p),5000);});
+test('Protective put pays premium and preserves upside',()=>{assert.equal(E.cornOutcome('put',3),4800);assert.equal(E.cornOutcome('put',5),4800);assert.equal(E.cornOutcome('put',7),6800);});
+const call=(side,strike,premium,quantity=1)=>({type:'call',side,strike,premium,quantity});
+test('Bull call spread has correct loss, upside and break-even',()=>{const legs=[call('buy',100,7),call('sell',110,3)];assert.equal(E.optionProfit(legs,80),-4);assert.equal(E.optionProfit(legs,104),0);assert.equal(E.optionProfit(legs,110),6);assert.equal(E.optionProfit(legs,120),6);});
+test('Butterfly evaluates center, wings and both break-evens',()=>{const legs=[call('buy',90,12),call('sell',100,6,2),call('buy',110,2)];for(const [p,expected] of [[80,-2],[90,-2],[92,0],[100,8],[108,0],[110,-2],[120,-2]])assert.equal(E.optionProfit(legs,p),expected);});
+test('Synthetic long has linear signed exposure for equal premiums',()=>{const legs=[call('buy',100,5),{type:'put',side:'sell',strike:100,premium:5,quantity:1}];for(const p of [0,80,100,120,200])assert.equal(E.optionProfit(legs,p),p-100);});
+test('Imported saves cannot invent scores, lives or progression gaps',()=>{const s=E.sanitizeSave({version:1,completed:['price','price','bull','unknown'],lives:99,coins:-3,scores:{price:999,bull:999},position:{x:Infinity,y:-200},look:'injected'},['price','ladder','bull']);assert.deepEqual(s.completed,['price']);assert.deepEqual(s.scores,{price:100});assert.equal(s.lives,3);assert.equal(s.coins,0);assert.deepEqual(s.position,{x:480,y:40});assert.equal(s.look,'purple');assert.throws(()=>E.sanitizeSave({version:2},[]));});
