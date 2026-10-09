@@ -2,6 +2,31 @@
 
 Una aventura educativa en español: caminas por una ciudad, ayudas a sus personajes y aprendes cómo funcionan precios, órdenes, futuros y opciones.
 
+## Nuevo prototipo: Rutas y riesgo (v0.2)
+
+Abre **Estrategia.html** con Chrome o Safari. Es una partida de estrategia y gestión, independiente de la aventura anterior: compras insumos, fabricas productos, abres rutas y envías pedidos en un archipiélago. No hay cuestionarios.
+
+- Selecciona regiones del mapa o las pestañas de acciones.
+- Comienzas con insumos: fabrica 10 de pan y envía su pedido.
+- El reloj empieza en pausa. Reanuda, cambia velocidad (1×/2×/4×) o avanza meses manualmente.
+- Un mes dura 15 segundos a 1×. La temporada tiene 18 meses visibles (17 avances), unos 4 minutos más el tiempo que pauses.
+- Ganas con 7 entregas, valor de empresa de $1,200 o más, efectivo no negativo y reputación positiva al cierre. El rival es una referencia de ritmo fija de 8 entregas; no modifica el mercado ni disputa territorios.
+- Se guarda automáticamente en el navegador cuando permite almacenamiento local, separado de la aventura anterior. Este prototipo no exporta partidas.
+
+### Reglas y simplificaciones del prototipo
+
+Tres insumos y productos: trigo/pan, cobre/cables, petróleo/combustible. La fábrica produce hasta 10 unidades por mes; ampliarla cuesta $160 y aumenta la capacidad a 20. Abrir cada ruta adicional cuesta $75. Cada viaje demora un mes; la congestión al despachar agrega uno. Los envíos en curso conservan su plazo. Las ventas tienen precios pactados; cobras al llegar. Un pedido incumplido descuenta $20 y una estrella. El saldo negativo o la reputación cero terminan la partida.
+
+Los eventos y pedidos siguen una secuencia fija para comparar decisiones al repetir. Todos los precios, primas, plazos y garantías son ficticios. No hay datos de mercado ni intermediarios conectados.
+
+- **Futuro largo:** 10 unidades, tres meses y $30 de garantía inicial fija. Cada cambio mensual de precio abona/cobra en efectivo `(precio nuevo − anterior) × 10`. Al cerrar/vencer se devuelve la garantía. No entrega materia prima: la compras por separado. Si falta efectivo se cierra un futuro y se libera su garantía. Se omiten margen de mantenimiento, riesgo de base, intereses y comisiones.
+- **Call europea con liquidación en efectivo:** 10 unidades, tres meses, strike igual al precio al contratar y prima fija de $20. Al vencer cobra `max(precio − strike, 0) × 10`; el resultado neto resta la prima. No hay ejercicio anticipado ni reventa. La prima fija no pretende valorar una opción real.
+- **Valor de empresa:** efectivo + insumos al precio actual + productos a su precio de venta + envíos pendientes + garantías + valor intrínseco de calls abiertas. Es una medida simplificada de progreso, no un valor realizable garantizado ni una cotización de opciones. Las calls que sigan abiertas si la partida termina antes se muestran pendientes.
+
+Archivos editables: `dist/strategy/`. Generar el archivo único: `npm run bundle:strategy`. Conservamos **Jugar.html** y `dist/` para comparar con el primer juego.
+
+Verificación: 7 pruebas nuevas del motor estratégico (20 totales con la aventura anterior), incluida una temporada ganable; campaña completa en Chrome con 10 entregas y $1,485, futuros y call vencidos, rutas congestionadas y guardado tras recargar. Sin errores de consola durante la prueba. La apertura directa del archivo único debe comprobarse manualmente; se probó servido por HTTP local.
+
 ## Jugar sin instalar nada
 
 En GitHub, pulsa **Code → Download ZIP**, descomprime la carpeta y abre **Jugar.html** con Chrome o Safari. Todo el juego está en ese archivo. Funciona sin hosting, cuentas, claves ni consultas a una IA. No necesita Node ni Python para jugar.
